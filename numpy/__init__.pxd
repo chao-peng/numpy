@@ -76,6 +76,8 @@ cdef extern from "numpy/arrayobject.h":
     ctypedef long double  npy_float96
     ctypedef long double  npy_float128
 
+    int NPY_UINTP "NPY_UINTP"
+
     ctypedef struct npy_cfloat:
         pass
 
