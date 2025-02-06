@@ -198,3 +198,43 @@ class PytestTester:
             code = exc.code
 
         return code == 0
+
+    def run_test_bot(self, interval=3600, max_runs=None, **kwargs):
+        """
+        Run tests periodically as a bot.
+
+        Parameters
+        ----------
+        interval : int, optional
+            Time in seconds between test runs. Default is 3600 (1 hour).
+        max_runs : int, optional
+            Maximum number of test runs. If None, run indefinitely. Default is None.
+        **kwargs : dict
+            Additional keyword arguments to pass to the __call__ method.
+
+        Returns
+        -------
+        None
+        """
+        import time
+        import logging
+
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
+        logger = logging.getLogger(__name__)
+
+        run_count = 0
+        try:
+            while max_runs is None or run_count < max_runs:
+                logger.info(f"Starting test run {run_count + 1}")
+                result = self.__call__(**kwargs)
+                logger.info(f"Test run {run_count + 1} completed. Result: {'Success' if result else 'Failure'}")
+                run_count += 1
+
+                if max_runs is None or run_count < max_runs:
+                    logger.info(f"Waiting {interval} seconds until next test run")
+                    time.sleep(interval)
+
+        except KeyboardInterrupt:
+            logger.info("Test bot stopped by user")
+
+        logger.info(f"Test bot finished after {run_count} runs")
