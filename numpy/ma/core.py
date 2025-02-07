@@ -3132,10 +3132,18 @@ class MaskedArray(ndarray):
                 pass
 
         # Finalize the fill_value
-        if self._fill_value is not None:
+        if hasattr(obj, '_fill_value') and obj._fill_value is not None:
+            # If fill_value has been accessed in the original object
+            self._fill_value = obj._fill_value
+        elif self._fill_value is None:
+            # If fill_value hasn't been accessed, use the default
+            self._fill_value = _check_fill_value(None, self.dtype)
+        else:
+            # If self._fill_value is not None, check it
             self._fill_value = _check_fill_value(self._fill_value, self.dtype)
-        elif self.dtype.names is not None:
-            # Finalize the default fill_value for structured arrays
+
+        # Finalize the default fill_value for structured arrays
+        if self.dtype.names is not None and self._fill_value is None:
             self._fill_value = _check_fill_value(None, self.dtype)
 
     def __array_wrap__(self, obj, context=None, return_scalar=False):
